@@ -10,17 +10,18 @@ import TabBarIcon from "@/components/TabBarIcon";
 import axiosInstance from "@/utils/axiosInstance";
 import { useEffect, useState } from "react";
 
+import { MenuItem } from "@/models/MenuItem"
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [ menus, setMenus ] = useState([]);
+  const [ menus, setMenus ] = useState<MenuItem[]>([]);
   useEffect(() => {
     getMenuList();
   }, []);
 
   const getMenuList = async () => {
     try {
-      let menuList = await axiosInstance.get("/menu");
+      let menuList = await axiosInstance.get<MenuItem[]>("/menu");
       setMenus(menuList.data);
     } catch (err) {
       console.error('Menu API 에러 : ', err);
@@ -37,42 +38,65 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}
     >
-      <Tabs.Screen
-        name="one"
-        options={{
-          title: "Tab One",
-          headerRight: () => (
-            <IconButton url="/modal" icon="info-circle" color="light" />
-          ),
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="code" size={25} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Index",
-          headerRight: () => (
-            <IconButton url="/modal" icon="info-circle" color="light" />
-          ),
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="home" size={25} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: "Tab Two",
-          headerRight: () => (
-            <IconButton url="/modal" icon="info-circle" color="light" />
-          ),
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="code" size={25} color={color} />
-          ),
-        }}
-      />
+      {/*-- 자동 생성되는 home 메뉴 삭제 --*/}
+      <Tabs.Screen name="home" options={{ href: null }} />
+
+      {menus.filter((menu) => menu.position == "L").map((menu) => (
+        <Tabs.Screen 
+          key={menu._id}
+          name={menu.name}
+          options={{
+              headerRight: 
+                menu.headerYn === 'Y' ?
+                  () => (
+                    <IconButton url="/modal" icon="info-circle" color="light" />
+                  )
+                : undefined
+              ,
+              tabBarIcon: ({ color }) => (
+              <TabBarIcon name="code" size={25} color={color} />
+            )
+          }}
+        />
+      ))}
+
+      {menus.filter((menu) => menu.position == "C").map((menu) => (
+        <Tabs.Screen
+          key={menu._id}
+          name={menu.name}
+          options={{
+            headerRight: 
+              menu.headerYn === 'Y' ?
+                () => (
+                  <IconButton url="/modal" icon="info-circle" color="light" />
+                )
+              : undefined
+            ,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="code" size={25} color={color} />
+            )
+          }}
+        />
+      ))}
+
+      {menus.filter((menu) => menu.position == "R").map((menu) => (
+        <Tabs.Screen
+          key={menu._id}
+          name={menu.name}
+          options={{
+            headerRight: 
+              menu.headerYn === 'Y' ?
+                () => (
+                  <IconButton url="/modal" icon="info-circle" color="light" />
+                )
+              : undefined
+            ,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="code" size={25} color={color} />
+            )
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
